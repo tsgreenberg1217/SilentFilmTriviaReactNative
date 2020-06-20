@@ -15,6 +15,11 @@ const GameView = ({navigation}) => {
     const question = questions[0]
     const choices = question.choices
     const choicesArray = new Array()
+    const answer = question.answer
+
+    const isCorrect = (choice) => {
+        console.log(answer == choice)
+    }
 
 
     Object.keys(choices).forEach(k =>{
@@ -25,24 +30,31 @@ const GameView = ({navigation}) => {
 
     return (
         <View style={styles.viewStyle}>
-            <Text style={styles.promptTextStyle}>{question.prompt}</Text>
 
-            <FlatList
-            keyExtractor = {c => c}
-            data = {choicesArray}
-            renderItem = {
-                ({index, item}) => {                 
-                    return (
-                        <TouchableOpacity style={styles.buttonStyle}>
-                                <Text style={styles.buttonTextStyle}>{ABC[index]})</Text>
-                                <Text style={styles.buttonTextStyle}>{item}</Text>
-                                <View/>
-                        </TouchableOpacity>
-                )
+            <View style={styles.promptViewStyle}>
+                <Text style={styles.promptTextStyle}>{question.prompt}</Text>
+            </View>
+            
+            
+            <View style = {styles.listStyle}>
+                <FlatList
+                    keyExtractor = {c => c}
+                    data = {choicesArray}
+                    renderItem = {
+                        ({index, item}) => {                 
+                            return (
+                                <TouchableOpacity 
+                                    onPress={() => {isCorrect(item)}}
+                                    style={styles.buttonStyle}>
+                                        <Text style={styles.buttonTextStyle}>{ABC[index]})</Text>
+                                        <Text style={styles.buttonTextStyle}>{item}</Text>
+                                        <View/>
+                                </TouchableOpacity>
+                        )
+                            }
                     }
-            }
-            />
-
+                    />
+            </View>
         </View>
     )
 }

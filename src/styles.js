@@ -36,6 +36,11 @@ const GameStyle = {
         backgroundColor:"#0E0E0E"
     },
 
+    listStyle: {
+        justifyContent:"flex-start",
+        flex:3
+    },
+
     animationViewStyle:{
         flex:1,
         justifyContent:"center",
@@ -49,17 +54,24 @@ const GameStyle = {
         flexDirection:"row",
         justifyContent:"space-between",
         alignItems:"center",
-        margin:30,
+        marginBottom:30,
         marginHorizontal:60,
-        marginBottom:0,
         borderWidth:1,
         borderColor:"white",
         height:60,
         padding:20
     },
+    promptViewStyle:{
+        flex:1,
+        justifyContent:"center",
+        alignItems:"center",
+    },
     promptTextStyle:{
+        // backgroundColor:"red",
+        padding:4,
         fontFamily: "cagliostro",
         color:"white",
+        textAlign:"center",
         fontSize:32
     },
     buttonTextStyle:{
