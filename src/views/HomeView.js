@@ -4,7 +4,7 @@ import LottieView from 'lottie-react-native'
 import {HomeStyle} from '../styles'
 import UserSchema from '../models/User'
 import Realm from 'realm'
-import {createUser, deleteAllUsers, queryAllUsers} from '../TriviaDatabase.js'
+import {initSessionData} from '../TriviaDatabase.js'
 
 
 
@@ -13,28 +13,11 @@ const HomeView = () => {
 
     
 
-    const makeQuestions = () =>{
-      user = {name:"Todd", inProgress:false}
-      createUser(user).then(user =>{
-        console.log('it worked!')
-      }).catch(e => {
-        console.log('welp, fuck me then', e)
-      })
-    }
-
-    const deleteUsers = () =>{
-      createUser(user).then(user =>{
-        console.log('it worked!')
-      }).catch(e => {
-        console.log('welp, fuck me then', e)
-      })
-    }
-
-    const getUsers = () =>{
-      queryAllUsers().then(user=>{
-        console.log("user is :", user.name)
+    const getSession = () =>{
+      initSessionData().then(session =>{
+        console.log(session)
       }).catch(e =>{
-        console.log('didnt query', e)
+        console.log("the error is", e)
       })
     }
 
@@ -45,7 +28,7 @@ const HomeView = () => {
 
                         <View style={styles.buttonsViewStyle}>
                             <TouchableOpacity
-                                onPress = {getUsers}
+                                onPress = {getSession}
                                 style={styles.buttonStyle}>
                                 <Text style={styles.buttonTextStyle}>Start</Text>
                             </TouchableOpacity>

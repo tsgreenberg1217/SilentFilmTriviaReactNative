@@ -1,10 +1,8 @@
-
-const UserSchema = {
-    name:"User",
+export const UserSchema = {
+    name: "User",
     properties:{
-        name:"string",
-        inProgress:'bool'
+      name: {type:'string', indexed:true},
+      isProgress:{type: "bool", default: false}
     }
-}
-
+  }
 export default UserSchema
