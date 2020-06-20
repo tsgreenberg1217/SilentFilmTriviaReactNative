@@ -1,25 +1,45 @@
-import React from 'react'
+import React, {useEffect} from 'react'
 import {View, StyleSheet, Text, TouchableOpacity} from 'react-native'
 import LottieView from 'lottie-react-native'
 import {HomeStyle} from '../styles'
 import UserSchema from '../models/User'
 import Realm from 'realm'
-import {initSessionData} from '../TriviaDatabase.js'
+import {initSessionData, toggleSession} from '../TriviaDatabase.js'
+import { StackActions, NavigationActions } from 'react-navigation';
 
 
 
-const HomeView = () => {
+const HomeView = props => {
     const styles = StyleSheet.create(HomeStyle)
 
-    
-
-    const getSession = () =>{
-      initSessionData().then(session =>{
-        console.log(session)
+    useEffect(() => {
+      initSessionData().then(sessionJson =>{
+        const session = JSON.parse(sessionJson)
+        if(session.inProgress) goToSession(session)
       }).catch(e =>{
         console.log("the error is", e)
+      })      
+    })
+
+
+    const startSession = () => {
+      toggleSession(true).then(()=>{
+        goToSession()
+      }).catch(e => {
+
       })
     }
+
+
+    const goToSession = (session) => {
+      const resetAction = StackActions.reset({
+        index: 0,
+        actions: [NavigationActions.navigate({ routeName: 'Game',params: {session} })],
+      })
+      props.navigation.dispatch(resetAction)
+
+    }
+
 
     const MainView =  <View style={styles.viewStyle}>
                         <View style={styles.animationViewStyle}>
@@ -28,7 +48,7 @@ const HomeView = () => {
 
                         <View style={styles.buttonsViewStyle}>
                             <TouchableOpacity
-                                onPress = {getSession}
+                                onPress = {startSession}
                                 style={styles.buttonStyle}>
                                 <Text style={styles.buttonTextStyle}>Start</Text>
                             </TouchableOpacity>

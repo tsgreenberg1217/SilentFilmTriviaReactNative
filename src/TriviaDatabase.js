@@ -10,6 +10,23 @@ const databaseOptions = {
   schemaVersion: 3
 }
 
+const getSession = (realm) => {
+  const data = realm.objects(SessionSchema.name)
+  return data[0]
+}
+
+
+
+const runDBProc = proc => {
+  Realm.open(databaseOptions).then(realm =>{
+    proc(realm)
+    realm.close
+  }).catch(e =>{
+    reject(e)
+  })
+}
+
+
 export const createUser = (user) => new Promise((resolve, reject)=>{
   Realm.open(databaseOptions).then(realm => {
     realm.write(()=>{
@@ -40,12 +57,9 @@ export const queryAllUsers = () => new Promise((resolve, reject)=>{
   }).catch(e => reject(e))
 })
 
-
-export const initSessionData = () => new Promise((resolve, reject) =>{
-  console.log('calling init session')
-  Realm.open(databaseOptions).then( realm => {
-    const data = realm.objects(SessionSchema.name)
-    const session = data[0]
+export const initSessionData = () => new Promise((resolve, reject) => {
+  runDBProc(realm =>{
+    const session = getSession(realm)
 
     // if no session exisits (first time), create default session
     if (!session){
@@ -56,10 +70,61 @@ export const initSessionData = () => new Promise((resolve, reject) =>{
     }else{
       console.log("session found")
     }
-    resolve(session)
-    realm.close()
-  }).catch(e =>{
-    reject(e)
+    const json = JSON.stringify(session)
+    resolve(json)
   })
 })
 
+export const toggleSession = progress => new Promise((resolve, reject) => {
+  runDBProc(realm => {
+    const session = getSession(realm)
+
+    realm.write(() => {
+      session.inProgress = progress
+      resolve
+    })
+
+  })
+})
+
+
+export const startSession = () => new Promise((resolve, reject) => {
+  runDBProc(realm => {
+    const session = getSession(realm)
+    realm.write(() => {
+      session.inProgress = progress
+      resolve
+    })
+  })
+})
+
+
+export const resetSession = () => new Promise((resolve, reject) => {
+  runDBProc(realm => {
+    const session = getSession(realm)
+    realm.write(() => {
+      session.inProgress = false
+      session.questions.map(q => {
+        q.isCorrect = false
+        q.isAnswered = false
+      })
+      resolve()
+    })
+  })
+})
+
+
+
+function getRandomQuestions(arr, n) {
+  var result = new Array(n),
+      len = arr.length,
+      taken = new Array(len);
+  if (n > len)
+      throw new RangeError("getRandom: more questions queried than available");
+  while (n--) {
+      var x = Math.floor(Math.random() * len);
+      result[n] = arr[x in taken ? taken[x] : x];
+      taken[x] = --len in taken ? taken[len] : len;
+  }
+  return result;
+}
