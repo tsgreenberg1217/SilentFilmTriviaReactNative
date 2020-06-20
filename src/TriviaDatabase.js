@@ -15,8 +15,6 @@ const getSession = (realm) => {
   return data[0]
 }
 
-
-
 const runDBProc = proc => {
   Realm.open(databaseOptions).then(realm =>{
     proc(realm)
@@ -25,37 +23,6 @@ const runDBProc = proc => {
     reject(e)
   })
 }
-
-
-export const createUser = (user) => new Promise((resolve, reject)=>{
-  Realm.open(databaseOptions).then(realm => {
-    realm.write(()=>{
-      realm.create(UserSchema.name, user)
-      resolve(user)
-    })
-    realm.close
-  }).catch(e => reject(e))
-})
-
-
-export const deleteAllUsers = () => new Promise((resolve, reject)=>{
-  Realm.open(databaseOptions).then(realm => {
-    realm.write(()=>{
-      const allUsers = realm.objects(UserSchema.name)
-      realm.delete(allUsers)
-      resolve()
-    })
-    realm.close
-  }).catch(e => reject(e))
-})
-
-export const queryAllUsers = () => new Promise((resolve, reject)=>{
-  Realm.open(databaseOptions).then(realm => {
-    const allUsers = realm.objects(UserSchema.name)
-    resolve(allUsers[0])
-    realm.close
-  }).catch(e => reject(e))
-})
 
 export const initSessionData = () => new Promise((resolve, reject) => {
   runDBProc(realm =>{
