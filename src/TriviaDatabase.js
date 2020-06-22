@@ -15,12 +15,10 @@ const getSession = (realm) => {
   return data[0]
 }
 
-const runDBProc = proc => {
+const runDBProc = callback => {
   Realm.open(databaseOptions).then(realm =>{
-    proc(realm)
+    callback(realm)
     realm.close
-  }).catch(e =>{
-    reject(e)
   })
 }
 
@@ -30,26 +28,29 @@ export const initSessionData = () => new Promise((resolve, reject) => {
 
     // if no session exisits (first time), create default session
     if (!session){
-      console.log('creating new session')
       realm.write(() => {
         realm.create(SessionSchema.name, DEFAULT_SESSION)
       })
+      newSession = getSession(realm)
+      const json = JSON.stringify(newSession)
+      resolve(json)
     }else{
-      console.log("session found")
+      const json = JSON.stringify(session)
+      resolve(json)
     }
-    const json = JSON.stringify(session)
-    resolve(json)
+    
   })
 })
 
 export const toggleSession = progress => new Promise((resolve, reject) => {
+  console.log('toggeling...')
   runDBProc(realm => {
     const session = getSession(realm)
     realm.write(() => {
       session.inProgress = progress
-      resolve
+      
     })
-
+    resolve(session)
   })
 })
 

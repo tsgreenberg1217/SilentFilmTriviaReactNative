@@ -1,5 +1,5 @@
 import React, {useEffect} from 'react'
-import {View, StyleSheet, Text, TouchableOpacity} from 'react-native'
+import { View, StyleSheet, Text, TouchableOpacity} from 'react-native'
 import LottieView from 'lottie-react-native'
 import {HomeStyle} from '../styles'
 import UserSchema from '../models/User'
@@ -11,7 +11,6 @@ import { StackActions, NavigationActions } from 'react-navigation';
 
 const HomeView = props => {
     const styles = StyleSheet.create(HomeStyle)
-
     useEffect(() => {
       initSessionData().then(sessionJson =>{
         const session = JSON.parse(sessionJson)
@@ -23,8 +22,8 @@ const HomeView = props => {
 
 
     const startSession = () => {
-      toggleSession(true).then(()=>{
-        goToSession()
+      toggleSession(true).then(session => {
+        goToSession(session)
       }).catch(e => {
 
       })
