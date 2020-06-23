@@ -76,9 +76,14 @@ export const getSessionData = () => new Promise((resolve, reject) => {
 
   runDBProc(realm => {
     const data = realm.objects(SessionSchema.name)[0]
-    const session = {inProgress: data.inProgress, questions: data.questions.slice(0,9)}
-    const sessionJson = JSON.stringify(session)
-    resolve(sessionJson)
+    if(!data){
+      resolve(null)
+    }else{
+      const session = {inProgress: data.inProgress, questions: data.questions.slice(0,9)}
+      const sessionJson = JSON.stringify(session)
+      resolve(sessionJson)
+    }
+    
   })
 })
 

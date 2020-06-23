@@ -23,7 +23,6 @@ const GameView = props => {
     if(noQuestions){
         console.log("no question")
         getQuestion(stub.id).then(json => {
-            console.log("json ", json)
             const q = JSON.parse(json) 
             console.log("fetched is ", q)
             setQuestion(q)
@@ -41,50 +40,54 @@ const GameView = props => {
 
     }
 
-    const getView = question => {
-        if(!question) return <Text>Getting question...</Text>
+    const getView = (noQuestions, question) => {
+        if(noQuestions){
+            return <Text>Getting question...</Text>
+        }else{
 
-        const choices = question.choices
-        console.log('choices are', choices)
-        const choicesArray = []
+            console.log('q choices are', question)
+            const choices = question.choices
+            console.log('choices are', choices)
+            const choicesArray = []
+        
+            Object.keys(choices).forEach(k =>{
+                const c = choices[k]
+                choicesArray.push(c)
+            })
     
-        Object.keys(choices).forEach(k =>{
-            const c = choices[k]
-            choicesArray.push(c)
-        })
-
-        return(
-            <View style={styles.viewStyle}>
-
-                <View style={styles.promptViewStyle}>
-                    <Text style={styles.promptTextStyle}>{question.prompt}</Text>
+            return(
+                <View style={styles.viewStyle}>
+    
+                    <View style={styles.promptViewStyle}>
+                        <Text style={styles.promptTextStyle}>{question.prompt}</Text>
+                    </View>
+                    
+                    
+                    <View style = {styles.listStyle}>
+                        <FlatList
+                            keyExtractor = {c => c}
+                            data = {choicesArray}
+                            renderItem = {
+                                ({index, item}) => {                 
+                                    return (
+                                        <TouchableOpacity 
+                                            onPress={() => {isCorrect(item)}}
+                                            style={styles.buttonStyle}>
+                                                <Text style={styles.buttonTextStyle}>{ABC[index]})</Text>
+                                                <Text style={styles.buttonTextStyle}>{item}</Text>
+                                                <View/>
+                                        </TouchableOpacity>
+                                )
+                                    }
+                            }
+                            />
+                    </View>
                 </View>
-                
-                
-                <View style = {styles.listStyle}>
-                    <FlatList
-                        keyExtractor = {c => c}
-                        data = {choicesArray}
-                        renderItem = {
-                            ({index, item}) => {                 
-                                return (
-                                    <TouchableOpacity 
-                                        onPress={() => {isCorrect(item)}}
-                                        style={styles.buttonStyle}>
-                                            <Text style={styles.buttonTextStyle}>{ABC[index]})</Text>
-                                            <Text style={styles.buttonTextStyle}>{item}</Text>
-                                            <View/>
-                                    </TouchableOpacity>
-                            )
-                                }
-                        }
-                        />
-                </View>
-            </View>
-        )
+            )
+        }
     }
 
-    const QuestionView = getView(question)
+    const QuestionView = getView(noQuestions, question)
 
         
     return QuestionView
