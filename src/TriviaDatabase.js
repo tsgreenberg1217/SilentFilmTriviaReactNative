@@ -1,69 +1,94 @@
 import Realm from 'realm'
-import {UserSchema} from './models/User'
-import {SessionSchema, DEFAULT_SESSION} from './models/Session'
-import {QuestionSchema} from './models/Question'
+import { SessionSchema } from './models/Session'
+import { QuestionSchema } from './models/Question'
+import { QuestionStubSchema } from './models/QuestionStub.js'
+import { QUESTIONS } from './models/QuestionsList.js'
+
 
 
 const databaseOptions = {
   path: "silent_film_trivia_rn_db.realm",
-  schema: [UserSchema, SessionSchema, QuestionSchema],
-  schemaVersion: 3
-}
-
-const getSession = (realm) => {
-  const data = realm.objects(SessionSchema.name)
-  return data[0]
+  schema: [SessionSchema, QuestionSchema, QuestionStubSchema],
+  schemaVersion: 5
 }
 
 const runDBProc = callback => {
   Realm.open(databaseOptions).then(realm =>{
     callback(realm)
-    realm.close
+    console.log('closing db')
+    realm.close()
   })
 }
 
-export const initSessionData = () => new Promise((resolve, reject) => {
+export const initGameData = () => new Promise((resolve, reject) => {
   runDBProc(realm =>{
-    const session = getSession(realm)
-
-    // if no session exisits (first time), create default session
-    if (!session){
+    const questions = realm.objects(QuestionSchema.name)[0]
+    // if no questions exisits (first time), create questions
+    if (!questions){
+      console.log('creating questions')
       realm.write(() => {
-        realm.create(SessionSchema.name, DEFAULT_SESSION)
+        QUESTIONS.forEach(q => {
+          realm.create(QuestionSchema.name, q)  
+        });
       })
-      newSession = getSession(realm)
-      const json = JSON.stringify(newSession)
-      resolve(json)
+      resolve()
     }else{
-      const json = JSON.stringify(session)
-      resolve(json)
+      // reconcile with server here
+      console.log('questions already exisit')
+      resolve()
     }
-    
   })
+
 })
 
-export const toggleSession = progress => new Promise((resolve, reject) => {
+export const createSession = progress => new Promise((resolve, reject) => {
   runDBProc(realm => {
-    const session = getSession(realm)
+
+    const questionsData = realm.objects(QuestionSchema.name)
+
+    const questions = []
+
+    Object.keys(questionsData).forEach(k => questions.push(questionsData[k]))
+    
+    // shuffle questions
+    for(let i = questions.length - 1; i > 0; i--){
+      const j = Math.floor(Math.random() * i)
+      const temp = questions[i]
+      questions[i] = questions[j]
+      questions[j] = temp
+    }
+
+    // map questions into stubs
+    const stubs = questions.slice(0,9).map(q => ({id: q._id, isCorrect: false, isAnswered: false}))
+
+    const newSession = { inProgress: true, questions: stubs }
+
     realm.write(() => {
-      session.inProgress = progress
+      console.log('creating new session')
+      realm.create(SessionSchema.name, newSession)
       
     })
-    resolve(session)
+    resolve(newSession)
   })
 })
 
+export const getSessionData = () => new Promise((resolve, reject) => {
 
-export const startSession = () => new Promise((resolve, reject) => {
   runDBProc(realm => {
-    const session = getSession(realm)
-    realm.write(() => {
-      session.inProgress = progress
-      resolve
-    })
+    const data = realm.objects(SessionSchema.name)[0]
+    const session = {inProgress: data.inProgress, questions: data.questions.slice(0,9)}
+    const sessionJson = JSON.stringify(session)
+    resolve(sessionJson)
   })
 })
 
+export const getQuestion = id => new Promise((resolve, reject) => {
+  runDBProc(realm => {
+    const question = realm.objects("Question").filtered("_id == $0", id)
+    const json = JSON.stringify(question[0])
+    resolve(json)
+  })
+})
 
 export const resetSession = () => new Promise((resolve, reject) => {
   runDBProc(realm => {

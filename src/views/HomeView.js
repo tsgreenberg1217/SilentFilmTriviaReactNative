@@ -1,10 +1,8 @@
 import React, {useEffect} from 'react'
 import { View, StyleSheet, Text, TouchableOpacity} from 'react-native'
 import LottieView from 'lottie-react-native'
-import {HomeStyle} from '../styles'
-import UserSchema from '../models/User'
-import Realm from 'realm'
-import {initSessionData, toggleSession} from '../TriviaDatabase.js'
+import { HomeStyle } from '../styles'
+import { initGameData,  createSession, getSessionData } from '../TriviaDatabase.js'
 import { StackActions, NavigationActions } from 'react-navigation';
 
 
@@ -12,17 +10,21 @@ import { StackActions, NavigationActions } from 'react-navigation';
 const HomeView = props => {
     const styles = StyleSheet.create(HomeStyle)
     useEffect(() => {
-      initSessionData().then(sessionJson =>{
-        const session = JSON.parse(sessionJson)
-        if(session.inProgress) goToSession(session)
-      }).catch(e =>{
-        console.log("the error is", e)
-      })      
+
+      initGameData().then(() => {
+        console.log('game data inited')
+        getSessionData().then(json =>{
+          if(!json) return
+          const session = JSON.parse(json)
+          session['questions'] = session.questions.slice(0,9)
+          if(session.inProgress) goToSession(session)
+        })
+      })
     })
 
 
     const startSession = () => {
-      toggleSession(true).then(session => {
+      createSession().then(session => {
         goToSession(session)
       }).catch(e => {
 
@@ -33,7 +35,7 @@ const HomeView = props => {
     const goToSession = (session) => {
       const resetAction = StackActions.reset({
         index: 0,
-        actions: [NavigationActions.navigate({ routeName: 'Game',params: {session} })],
+        actions: [NavigationActions.navigate({ routeName: 'Game',params: {stubs: session.questions} })],
       })
       props.navigation.dispatch(resetAction)
 
