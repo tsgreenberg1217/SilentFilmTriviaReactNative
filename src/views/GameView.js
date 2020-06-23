@@ -5,12 +5,13 @@ import QuestionView from "./QuestionView"
 import {GameStyle} from '../styles'
 import { FlatList } from 'react-native-gesture-handler'
 import { color } from 'react-native-reanimated'
+import { StackActions, NavigationActions } from 'react-navigation';
 
 
-const GameView = ({navigation}) => {
+const GameView = props => {
     const ABC = ["a","b","c","d"]
     const styles = StyleSheet.create(GameStyle)
-    const session = navigation.state.params.session
+    const session = props.navigation.state.params.session
     const questions = session.questions
     const question = questions[0]
     const choices = question.choices
@@ -18,7 +19,13 @@ const GameView = ({navigation}) => {
     const answer = question.answer
 
     const isCorrect = (choice) => {
-        console.log(answer == choice)
+        const isCorrect = choice == answer
+        const answerAction = StackActions.reset({
+            index: 0,
+            actions: [NavigationActions.navigate({ routeName: 'Answer',params: {isCorrect, question} })],
+          })
+          props.navigation.dispatch(answerAction)
+
     }
 
 

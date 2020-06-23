@@ -43,7 +43,6 @@ export const initSessionData = () => new Promise((resolve, reject) => {
 })
 
 export const toggleSession = progress => new Promise((resolve, reject) => {
-  console.log('toggeling...')
   runDBProc(realm => {
     const session = getSession(realm)
     realm.write(() => {

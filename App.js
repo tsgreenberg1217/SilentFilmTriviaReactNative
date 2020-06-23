@@ -4,11 +4,13 @@ import {createAppContainer} from 'react-navigation'
 
 import HomeView from './src/views/HomeView';
 import GameView from './src/views/GameView';
+import AnswerView from './src/views/AnswerView';
 
 
 const navigator = createStackNavigator({
     Home:HomeView,
-    Game:GameView  
+    Game:GameView,
+    Answer:AnswerView
   },
   {
     initialRouteName: "Home",
