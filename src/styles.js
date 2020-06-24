@@ -33,23 +33,10 @@ const HomeStyle = {
 const GameStyle = {
     viewStyle:{
         flex: 1,
+        justifyContent:"space-evenly",
         backgroundColor:"#0E0E0E"
     },
 
-    listStyle: {
-        justifyContent:"flex-start",
-        flex:3
-    },
-
-    animationViewStyle:{
-        flex:1,
-        justifyContent:"center",
-        alignItems:"center"
-    },
-    buttonsViewStyle:{
-        justifyContent:"flex-start",
-        flex:1
-    },
     buttonStyle:{
         flexDirection:"row",
         justifyContent:"space-between",
@@ -59,16 +46,12 @@ const GameStyle = {
         borderWidth:1,
         borderColor:"white",
         height:60,
-        padding:20
+        padding:15
     },
-    promptViewStyle:{
-        flex:1,
-        justifyContent:"center",
-        alignItems:"center",
-    },
+
     promptTextStyle:{
-        // backgroundColor:"red",
-        padding:4,
+        marginTop:10,
+        marginHorizontal:18,
         fontFamily: "cagliostro",
         color:"white",
         textAlign:"center",
@@ -79,57 +62,41 @@ const GameStyle = {
         color:"white",
         fontSize:20,
         textAlign:"center"
-    }
+    },
+
 }
 
 const AnswerStyle = {
     viewStyle:{
         flex: 1,
+        justifyContent:"space-around",
         backgroundColor:"#0E0E0E"
     },
 
-    listStyle: {
-        justifyContent:"flex-start",
-        flex:3
-    },
-
-    animationViewStyle:{
-        flex:1,
-        justifyContent:"center",
-        alignItems:"center"
-    },
     buttonsViewStyle:{
         justifyContent:"flex-start",
         flex:1
     },
     buttonStyle:{
-        flexDirection:"row",
-        justifyContent:"space-between",
-        alignItems:"center",
-        marginBottom:30,
+        justifyContent:"center",
+        margin:30,
         marginHorizontal:60,
+        marginBottom:20,
         borderWidth:1,
         borderColor:"white",
-        height:60,
-        padding:20
-    },
-    promptViewStyle:{
-        flex:1,
-        justifyContent:"center",
-        alignItems:"center",
-    },
-    promptTextStyle:{
-        // backgroundColor:"red",
-        padding:4,
-        fontFamily: "cagliostro",
-        color:"white",
-        textAlign:"center",
-        fontSize:32
+        height:60
     },
     buttonTextStyle:{
         fontFamily: "cagliostro",
         color:"white",
         fontSize:20,
+        textAlign:"center"
+    },
+    infoStyle:{
+        fontSize: 16,
+        fontFamily: "cagliostro",
+        color:"white",
+        marginHorizontal:20,
         textAlign:"center"
     },
     imgView: {

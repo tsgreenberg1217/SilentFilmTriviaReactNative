@@ -1,53 +1,68 @@
 import React, {useState} from 'react'
-import {View, Text, StyleSheet, TouchableOpacity} from 'react-native'
-import {GameStyle} from '../styles'
-import { FlatList } from 'react-native-gesture-handler'
+import { Text } from 'react-native'
 import { StackActions, NavigationActions } from 'react-navigation';
-import { getQuestion } from '../TriviaDatabase'
+import { getQuestion, getSessionData, updateSession, deleteSession } from '../TriviaDatabase'
+import QuestionView from './QuestionView.js'
 
 
 const GameView = props => {
-    console.log('in game view')
     const [question, setQuestion] = useState({})
-    console.log('past state')
-    const ABC = ["a","b","c","d"]
-    const styles = StyleSheet.create(GameStyle)
-    const stubs = props.navigation.state.params.stubs
-    const stub = stubs.find(sb => !sb.isAnswered)
-
-    // console.log('found stub is', stub)
-    console.log('state is', question)
+    
+    // checks if state is {}
     const noQuestions = Object.keys(question).length == 0
-    console.log('no questions ',noQuestions)
 
     if(noQuestions){
-        console.log("no question")
-        getQuestion(stub.id).then(json => {
-            const q = JSON.parse(json) 
-            console.log("fetched is ", q)
-            setQuestion(q)
+        getSessionData().then(json => {
+            const session = JSON.parse(json)
+            const stub = session.questions.find(stub => !stub.isAnswered)
+
+            if(stub){
+                getQuestion(stub.id).then(q => {
+                    setQuestion(JSON.parse(q))
+                })
+            } else{
+                endGame()
+            }
+
+            
         })
     }
 
+    const endGame = () => deleteSession().then(() => goToHome())
+    
+
+    const goToHome = () => {
+        const resetAction = StackActions.reset({
+            index: 0,
+            actions: [NavigationActions.navigate({ routeName: 'Home' })],
+          })
+          props.navigation.dispatch(resetAction)
+    }
 
     const isCorrect = choice => {
         const isCorrect = choice == question.answer
+        const stubId = question._id
+        const updateObj = {inProgress: true, stub:{id: stubId, isAnswered: true, isCorrect: isCorrect}}
+        updateSession(updateObj).then(() =>  {
+            goToAnswer(isCorrect)
+        } )
+        
+
+    }
+
+    const goToAnswer = isCorrect => {
         const answerAction = StackActions.reset({
             index: 0,
             actions: [NavigationActions.navigate({ routeName: 'Answer',params: {isCorrect, question} })],
           })
           props.navigation.dispatch(answerAction)
-
     }
 
     const getView = (noQuestions, question) => {
         if(noQuestions){
             return <Text>Getting question...</Text>
         }else{
-
-            console.log('q choices are', question)
-            const choices = question.choices
-            console.log('choices are', choices)
+            const {prompt, choices} = question
             const choicesArray = []
         
             Object.keys(choices).forEach(k =>{
@@ -55,42 +70,11 @@ const GameView = props => {
                 choicesArray.push(c)
             })
     
-            return(
-                <View style={styles.viewStyle}>
-    
-                    <View style={styles.promptViewStyle}>
-                        <Text style={styles.promptTextStyle}>{question.prompt}</Text>
-                    </View>
-                    
-                    
-                    <View style = {styles.listStyle}>
-                        <FlatList
-                            keyExtractor = {c => c}
-                            data = {choicesArray}
-                            renderItem = {
-                                ({index, item}) => {                 
-                                    return (
-                                        <TouchableOpacity 
-                                            onPress={() => {isCorrect(item)}}
-                                            style={styles.buttonStyle}>
-                                                <Text style={styles.buttonTextStyle}>{ABC[index]})</Text>
-                                                <Text style={styles.buttonTextStyle}>{item}</Text>
-                                                <View/>
-                                        </TouchableOpacity>
-                                )
-                                    }
-                            }
-                            />
-                    </View>
-                </View>
-            )
+            return <QuestionView prompt = {prompt} choices = {choicesArray} isCorrectCallBack = {isCorrect} /> 
         }
     }
 
-    const QuestionView = getView(noQuestions, question)
-
-        
-    return QuestionView
+    return getView(noQuestions, question)
 
 
 }

@@ -1,12 +1,14 @@
 import React, {useEffect, useState} from 'react'
-import { Image } from 'react-native'
+import { Image, View } from 'react-native'
 import { getGiph } from '../services/GiphyService.js'
 
 const GifContainerView = ({giphyId}) => {
-    [url, setUrl] = useState(null)
+    [url, setUrl] = useState("")
+
+    const noUrl = Object.keys(url).length == 0
 
     useEffect(() => {
-        if(!url){
+        if(noUrl){
             getGiph(giphyId).then( res =>{
                 setUrl(res.data.data.images.downsized.url)
             }).catch(e =>{
@@ -16,7 +18,7 @@ const GifContainerView = ({giphyId}) => {
         
     })
 
-    return <Image style={{height:330, width:330}} source={{uri: url}} />
+    return url ? <Image style={{height:330, width:330}} source={{uri: url }} /> : <View/>
 }
 
 export default GifContainerView

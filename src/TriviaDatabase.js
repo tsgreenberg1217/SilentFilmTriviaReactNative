@@ -110,6 +110,35 @@ export const resetSession = () => new Promise((resolve, reject) => {
 })
 
 
+export const updateSession = updateObj => new Promise((resolve, reject) => {
+  const inProgress = updateObj['inProgress']
+  const stub = updateObj['stub']
+  runDBProc(realm => {
+      const session = realm.objects(SessionSchema.name)[0]
+      realm.write(() => {
+        if(inProgress !== undefined) session.inProgress = inProgress
+        if(stub !== undefined){
+          const question = session.questions.filtered("id == $0", stub.id)[0]
+          question.isAnswered = stub.isAnswered
+          question.isCorrect = stub.isCorrect 
+        }
+      })
+      resolve()
+  })
+})
+
+
+
+export const deleteSession = () => new Promise((resolve, reject) => {
+  runDBProc(realm => {
+    realm.write(()=>{
+      const session = realm.objects(SessionSchema.name)[0]
+      realm.delete(session)
+      resolve()
+    })
+  })
+})
+
 
 function getRandomQuestions(arr, n) {
   var result = new Array(n),

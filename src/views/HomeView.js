@@ -16,26 +16,23 @@ const HomeView = props => {
         getSessionData().then(json =>{
           if(!json) return
           const session = JSON.parse(json)
-          session['questions'] = session.questions.slice(0,9)
-          if(session.inProgress) goToSession(session)
+          if(session.inProgress) goToSession()
         })
       })
     })
 
 
     const startSession = () => {
-      createSession().then(session => {
-        goToSession(session)
-      }).catch(e => {
-
-      })
+      createSession()
+      .then(session => goToSession())
+      .catch(e => {})
     }
 
 
-    const goToSession = (session) => {
+    const goToSession = () => {
       const resetAction = StackActions.reset({
         index: 0,
-        actions: [NavigationActions.navigate({ routeName: 'Game',params: {stubs: session.questions} })],
+        actions: [NavigationActions.navigate({ routeName: 'Game' })],
       })
       props.navigation.dispatch(resetAction)
 
